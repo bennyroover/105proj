@@ -8,6 +8,7 @@
 * An HC-SR04 ultrasonic range sensor mounted atop a small hobby servo
 */
 #include <Servo.h>
+#include "asyncRest.h"
 Servo servo;
 
 // Ultrasonic Module pins
@@ -39,16 +40,23 @@ void go( enum Motor m, int speed)
 }
 
 bool sinDrive(double freq, int duration) { // duration in seconds
-  static int tstart = millis();
-//  const double samplePeriod = 1 / (freq * 16);
+  static int tstart;
+  static bool init = true;
+
+  if (init) {
+     tstart = millis();
+     init = false;
+  }
   
   double t = millis();
   int speed;
 
-//  Serial.print("tstart is ");
-//  Serial.print(tstart);
-//  Serial.print(" t is ");
-//  Serial.println(t);
+  Serial.print("tstart is ");
+  Serial.print(tstart);
+  Serial.print(" t is ");
+  Serial.println(t);
+  Serial.print("init is ");
+  Serial.println(init);
 
   if (t < tstart + duration*1000) {
     speed = 255*sin(2*PI*freq*t/1000);
@@ -64,6 +72,7 @@ bool sinDrive(double freq, int duration) { // duration in seconds
 
   go(LEFT, 0);
   go(RIGHT, 0);
+  init = true;
   return false;
   
 }
@@ -167,5 +176,7 @@ void loop() {
   while (sinDrive(freq, duration)) {
     
   }
+
+  delay(1000);
 
 }
