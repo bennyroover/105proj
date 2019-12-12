@@ -8,7 +8,6 @@
 * An HC-SR04 ultrasonic range sensor mounted atop a small hobby servo
 */
 #include <Servo.h>
-#include "asyncRest.h"
 Servo servo;
 
 // Ultrasonic Module pins
@@ -51,22 +50,16 @@ bool sinDrive(double freq, int duration) { // duration in seconds
   double t = millis();
   int speed;
 
-  Serial.print("tstart is ");
-  Serial.print(tstart);
-  Serial.print(" t is ");
-  Serial.println(t);
-  Serial.print("init is ");
-  Serial.println(init);
+//  Serial.print("tstart is ");
+//  Serial.print(tstart);
+//  Serial.print(" t is ");
+//  Serial.println(t);
+
 
   if (t < tstart + duration*1000) {
     speed = 255*sin(2*PI*freq*t/1000);
     go(LEFT, speed);
     go(RIGHT, -1*speed);
-//    Serial.print("left is ");
-//    Serial.print(speed);
-//    Serial.print(" right is ");
-//    Serial.println(-1*speed);
-//    t += samplePeriod;
     return true;
   }
 
@@ -145,6 +138,8 @@ void setup() {
   Serial.begin(9600);
 }
 
+
+
 void loop() {
 //  readNextDistance();
 //  // See if something is too close at any angle
@@ -165,18 +160,15 @@ void loop() {
 //  // Check the next direction in 50 ms
 //  delay(50);
 
-  double freq = 5;
-  double duration = 5;
-  while (sinDrive(freq, duration)) {
-    
+  double duration = 3;
+  const int NFREQ = 12;
+
+  int freq[NFREQ] = {0.5000, 0.7600, 1.1551, 1.7556, 2.6683, 4.0557, 6.1642, 9.3691, 14.2402, 21.6438, 32.8967, 50.0000};
+  
+  for (int i = 0; i < NFREQ; i++) {
+    while (sinDrive(freq[i], duration)) {
+      
+    }
   }
-
-  delay(1000);
-
-  while (sinDrive(freq, duration)) {
-    
-  }
-
-  delay(1000);
 
 }
