@@ -39,7 +39,7 @@ bool line_pid(int reference, int duration) {
   int output;
 
   const int kp = 5;
-  const int kd = 10;
+  const int kd = 8;
   const int ki = 0;
   int left_ctrl, right_ctrl;
 
