@@ -141,6 +141,7 @@ void setup() {
   pinMode(in3Pin, OUTPUT);
   pinMode(in4Pin, OUTPUT);
   pinMode(enBPin, OUTPUT);
+  pinMode(9, OUTPUT);
   servo.attach(servoPin);
   servo.write(90);
 //  go(LEFT, 0);
@@ -222,10 +223,10 @@ void setup() {
 
     delay(12000);
 
-    reference = getYaw();
+    reference = -.01;
 }
 
-float getYaw() {
+float getPitch() {
   // if programming failed, don't try to do anything
     if (!dmpReady) return;
 
@@ -286,44 +287,44 @@ float getYaw() {
         digitalWrite(LED_PIN, blinkState);
     }
 
-    return ypr[0];
+    return ypr[1];
 }
 
 // PID controller
-void pidYaw(float reference) {
+void pidPitch(float reference) {
   // errors
   static float e_prev = 0;
   static float e_accum = 0;
-  float yaw, e;
+  float pitch, e;
   int output;
 
   // gains
-  const int kp = 80;
-  const int kd = 275;
-  const int ki = .2;
+  const float kp = 300;
+  const float kd = 700;
+  const float ki = 1.5;
   int left_ctrl, right_ctrl;
 
   // get current error
-  yaw = getYaw();
-  e = (reference - yaw) / M_PI*180;
+  pitch = getPitch();
+  e = (reference - pitch) / M_PI*180;
 
   // calculate and saturate output
   output = kp*e + kd*(e - e_prev) + ki*e_accum;
-  if (output > 255) output = 255;
-  if (output < -255) output = -255;  //saturate output
+ // if (output > 255) output = 255;
+ // if (output < -255) output = -255;  //saturate output
 
   //drive motors
-  right_ctrl = -output;
+  bright_ctrl = output;
   left_ctrl = output;
   
-  go(LEFT, left_ctrl*0.85);
+  go(LEFT, left_ctrl);
   go(RIGHT, right_ctrl);
 
   e_prev = e;
   e_accum = e_accum + e;
-
-
-  /*Serial.print("error is\t");
+  
+/*
+  Serial.print("error is\t");
   Serial.println(e);
   Serial.print("Output is:\t");
   Serial.println(output);
@@ -335,9 +336,13 @@ void pidYaw(float reference) {
 }
 
 void loop() {
-  pidYaw(reference);
+  static int state = 0;
+  digitalWrite(9, state);
+  state = !state;
+  pidPitch(reference);
   
-//  float ref = getYaw();
+  
+//  float ref = getPitch();
 //  float e = ref / M_PI*180.0;
 //  Serial.println(e);
 }
